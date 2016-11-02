@@ -1,0 +1,42 @@
+.buttonGroup {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.buttonGroup * {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.myipn-controller {
+    font-size: 12px;
+    order: -1;
+    flex-grow: 1;
+    justify-content: space-between;
+    margin: 0 2.5em 0 .5em;
+}
+
+.myipn-controller a:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.myipn-jump {
+    flex-direction: row;
+}
+
+.myipn-button-jump {
+    width: 4em;
+}
+
+.myipn-button {
+    margin: 0 .2em;
+    padding: 0 .4em;
+    border: solid 1px #999;
+    border-radius: 5px;
+}
+
+.myipn-speed-control {
+    padding: 0 .4em;
+}
