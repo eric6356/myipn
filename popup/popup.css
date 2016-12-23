@@ -1,0 +1,19 @@
+html, body, div, label, input {
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 10rem;
+    flex-direction: column;
+}
+
+.input-group {
+    width: 100%;
+}
+
+.input-group--notify {
+    font-size: 1.2rem;
+    justify-content: space-between
+}
