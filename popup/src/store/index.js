@@ -1,8 +1,30 @@
-const allPrograms = ["壁下观", "硬影像", "流行通信", "(Hi)story", "味之道", "内核恐慌", "博物志", "一天世界", "IT 公论", "太医来了", "無次元", "疯投圈", "时尚怪物", "选·美"]
+import Vue from 'vue'
+import Vuex from 'vuex'
+
+Vue.use(Vuex)
+
+export const allPrograms = ["壁下观", "硬影像", "流行通信", "(Hi)story", "味之道", "内核恐慌", "博物志", "一天世界", "IT 公论", "太医来了", "無次元", "疯投圈", "时尚怪物", "选·美"]
+
+export const ipnIconDict = {
+    '壁下观': 'icon-bixiaguan-300.png',
+    '博物志': 'icon-bowuzhi-300.png',
+    '疯投圈': 'icon-crazycapital-300.png',
+    '时尚怪物': 'icon-fashionmonster-300.png',
+    '硬影像': 'icon-hardimage-300.png',
+    '(Hi)story': 'icon-history-300.png',
+    'IT公论': 'icon-itgonglun-300.png',
+    '内核恐慌': 'icon-kernelpanic-300.png',
+    '流行通信': 'icon-popdispatch-300.png',
+    '太医来了': 'icon-taiyilaile-300.png',
+    '無次元': 'icon-wcy-300.jpg',
+    '味之道': 'icon-weizhidao-300.png',
+    '选·美': 'icon-xuanmei-300.png',
+    '一天世界': 'icon-yitianshijie-300.png',
+}
 
 const state = {
     subscribedPrograms: ["壁下观", "硬影像", "流行通信", "(Hi)story", "味之道", "内核恐慌", "博物志", "一天世界", "IT 公论", "太医来了", "無次元", "疯投圈", "时尚怪物", "选·美"],
-    itemQueue: [{
+    podcastQueue: [{
         "episode": 41,
         "link": "https://ipn.li/yitianshijie/41",
         "listened": false,
@@ -167,15 +189,15 @@ const state = {
     badgeEnabled: null
 }
 
-const helper = {
-    getItemByTitle(title) {
-        for (let item of state.itemQueue) {
+export const helper = {
+    getItemByTitle(state, title) {
+        for (let item of state.podcastQueue) {
             if (item && item.title == title) {
                 return item
             }
         }
     },
-    updateStateFromStorage() {
+    updateStateFromStorage(state) {
         window.chrome.storage.sync.get(Object.keys(state), x => {
             Object.keys(x).map(k => {
                 Vue.set(state, k, x[k])
@@ -183,14 +205,17 @@ const helper = {
             console.log(`state updated: ${JSON.stringify(state)}`)
         })
     },
-    saveStateToStorage() {
+    saveStateToStorage(state) {
         window.chrome.storage.sync.set(state)
+    },
+    getIconName(podcast) {
+        return ipnIconDict[podcast.program]
     }
 }
 
 const getters = {
-    unlistened() {
-        let itemList = state.itemQueue.filter(item => item.program in state.subscribed && !item.listened)
+    unlistened(state) {
+        let itemList = state.podcastQueue.filter(podcast => state.subscribedPrograms.indexOf(podcast.program) !== -1 && !podcast.listened)
         itemList.reverse()
         return itemList
     }
@@ -203,3 +228,9 @@ const mutations = {
 
     }
 }
+
+export const store = new Vuex.Store({
+    state,
+    getters,
+    mutations,
+})

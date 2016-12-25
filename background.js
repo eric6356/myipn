@@ -82,11 +82,11 @@ function isNewPodcast(podcast) {
     })
 }
 
-function pushItems(items) {
-    // items: [latestItem, secondLatestItem, ... oldestItem]
+function pushPodcasts(podcasts) {
+    // podcasts: [latestPodcast, secondLatestPodcast, ... oldestPodcast]
     return new Promise(function(resolve, reject) {
         chrome.storage.sync.get('podcastQueue', function(x) {
-            items.slice().reverse().map(function(item) {
+            podcasts.slice().reverse().map(function(item) {
                 x.podcastQueue.shift()
                 x.podcastQueue.push({
                     title: item.title,
@@ -102,7 +102,7 @@ function pushItems(items) {
             chrome.storage.sync.set({
                 podcastQueue: x.podcastQueue
             }, function() {
-                resolve(items)
+                resolve(podcasts)
             })
         })
     })
@@ -151,7 +151,7 @@ function fetchAndUpdate(mute) {
             return isNewPodcast(oldestPodcast)
         })
         .then(function(result) {
-            var index = result.isNew ? items.length : result.indexInQueue
+            var index = result.isNew ? podcasts.length : result.indexInQueue
             console.log(`index: ${index}, result: ${JSON.stringify(result)}`)
             var podcastsToPush = podcasts.slice(0, index)
             if (podcastsToPush.length) {
@@ -189,12 +189,10 @@ chrome.storage.sync.get({
 })
 
 chrome.alarms.onAlarm.addListener(function(alarm) {
-if (alarm.name === 'fetch') {
-    console.log(`fetch and update at ${new Date()}`)
-    fetchAndUpdate()
-}
-})
-}
+    if (alarm.name === 'fetch') {
+        console.log(`fetch and update at ${new Date()}`)
+        fetchAndUpdate()
+    }
 })
 
 chrome.alarms.onAlarm.addListener(function(alarm) {
