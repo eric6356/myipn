@@ -1,23 +1,6 @@
-var ipnIconDict = {
-    '壁下观': 'icon-bixiaguan-300.png',
-    '博物志': 'icon-bowuzhi-300.png',
-    '疯投圈': 'icon-crazycapital-300.png',
-    '时尚怪物': 'icon-fashionmonster-300.png',
-    '硬影像': 'icon-hardimage-300.png',
-    '(Hi)story': 'icon-history-300.png',
-    'IT公论': 'icon-itgonglun-300.png',
-    '内核恐慌': 'icon-kernelpanic-300.png',
-    '流行通信': 'icon-popdispatch-300.png',
-    '太医来了': 'icon-taiyilaile-300.png',
-    '無次元': 'icon-wcy-300.jpg',
-    '味之道': 'icon-weizhidao-300.png',
-    '选·美': 'icon-xuanmei-300.png',
-    '一天世界': 'icon-yitianshijie-300.png',
-}
-
 chrome.runtime.onInstalled.addListener(function() {
     var podcastQueue = new Array(20) //podcastQueue: [oldestPodcast, secondOldestPodcast, ... latestPodcast]
-    var subscribedPrograms = ['味之道', '流行通信', '壁下观看', '疯投圈', '太医来了', '内核恐慌', '时尚怪物', '一天世界', '硬影像', '博物志', '無次元']
+    var subscribedPrograms = ['weizhidao', 'popdispatch', 'bixiaguan', 'crazycapital', 'taiyilaile', 'kernelpanic', 'fashionmonster', 'yitianshijie', 'hardimage', 'bowuzhi', 'wuciyuan']
     chrome.storage.sync.set({
         podcastQueue: podcastQueue,
         subscribedPrograms: subscribedPrograms,
@@ -42,10 +25,10 @@ function parsePodcastItem(itemEL) {
         }
     }
     var splitTitle = item.title.split(' ')
-    item.program = splitTitle[0]
     item.episode = parseInt(splitTitle[1].slice(1, -1))
     item.pureTitle = splitTitle[2]
     item.pubDate = new Date(item.pubDate).toJSON()
+    item.program = item.link.split('/').slice(-2, -1)[0]
     return item
 }
 
@@ -118,7 +101,7 @@ function notifyPodcastIfSubscribed(podcast) {
                 }
                 var opt = {
                     type: 'basic',
-                    iconUrl: 'img/ipn_icons/' + ipnIconDict[podcast.program],
+                    iconUrl: 'img/ipn_icons/' + ['icon', podcast.program, '300.png'].join('-'),
                     title: '#' + podcast.episode + ' ' + podcast.pureTitle,
                     message: message,
                     isClickable: true
@@ -138,6 +121,9 @@ function fetchAndUpdate(mute) {
     fetch('http://ipn.li/feed')
         .then(function(response) {
             // get string from fetch request
+            if (!response.ok) {
+                throw Error(response.statusText)
+            }
             return response.text()
         })
         .then(function(text) {
@@ -163,11 +149,12 @@ function fetchAndUpdate(mute) {
                 return Promise.all(podcasts.map(notifyPodcastIfSubscribed))
             }
         })
+        .catch(err => console.log(err))
 }
 
 chrome.notifications.onClicked.addListener(function(title) {
     console.log(title)
-    isNewItem({
+    isNewPodcast({
             title: title
         })
         .then(function(result) {
