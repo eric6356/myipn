@@ -96,7 +96,7 @@
         </div>
         <div class="popup__header-icon popup__header-icon--right">
             <div class="popup__header-icon--inner" v-show="podcastCount && !showAll" @click="markAll">
-                <button-checkmark :title="'标记全部'" :fill="'#0052a5'" :checked="true"/>
+                <button-checkmark :title="'全标已听'" :fill="'#0052a5'" :checked="true"/>
             </div>
         </div>
     </div>
@@ -138,7 +138,7 @@ import ButtonCheckmark from './ButtonCheckmark.vue'
 export default {
     data() {
         return {
-            activeCell: null,
+            activeCell: 2,
             showAll: false
         }
     },
