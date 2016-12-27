@@ -4,6 +4,8 @@ body {
     font-family: 'Avenir Next', Avenir, 'Helvetica Neue', Helvetica, 'Lantinghei SC', 'Hiragino Sans GB', sans-serif;
     width: 14rem;
 }
+body::-webkit-scrollbar{width:0px}
+
 
 body,
 div,
@@ -21,12 +23,15 @@ li {
     padding: 0;
 }
 
+::selection {
+    background: none;
+}
+
 .popup__header {
     font-size: 1.2rem;
     width: 14rem;
     display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid black;
 }
 
 .popup__header-icon {
@@ -34,6 +39,9 @@ li {
     width: 2rem;
     justify-content: center;
     align-items: center;
+}
+.popup__header-icon--inner {
+    cursor: pointer;
 }
 
 .bixiaguan {
@@ -84,7 +92,7 @@ li {
 <template>
 
 <div id="popup">
-    <unlistened/>
+    <podcast-list/>
     <preference/>
 </div>
 
@@ -92,13 +100,13 @@ li {
 
 <script>
 
-import Unlistened from './Unlistened.vue'
+import PodcastList from './PodcastList.vue'
 import Preference from './Preference.vue'
 
 export default {
     name: 'popup',
     components: {
-        Unlistened,
+        PodcastList,
         Preference
     }
 }

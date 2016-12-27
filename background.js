@@ -26,7 +26,7 @@ function parsePodcastItem(itemEL) {
     }
     var splitTitle = item.title.split(' ')
     item.episode = parseInt(splitTitle[1].slice(1, -1))
-    item.pureTitle = splitTitle[2]
+    item.pureTitle = splitTitle.slice(2).join('')
     item.pubDate = new Date(item.pubDate).toJSON()
     item.program = item.link.split('/').slice(-2, -1)[0]
     return item

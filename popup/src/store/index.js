@@ -6,7 +6,8 @@ Vue.use(Vuex)
 export const allPrograms = ['bixiaguan', 'bowuzhi', 'crazycapital', 'fashionmonster', 'hardimage', 'history', 'itgonglun', 'kernelpanic', 'popdispatch', 'taiyilaile', 'wuciyuan', 'weizhidao', 'xuanmei', 'yitianshijie']
 
 const state = {
-    subscribedPrograms: ['weizhidao', 'popdispatch', 'bixiaguan', 'crazycapital', 'taiyilaile', 'kernelpanic', 'fashionmonster', 'yitianshijie', 'hardimage', 'bowuzhi', 'wuciyuan'],
+    // subscribedPrograms: ['weizhidao', 'popdispatch', 'bixiaguan', 'crazycapital', 'taiyilaile', 'kernelpanic', 'fashionmonster', 'yitianshijie', 'hardimage', 'bowuzhi', 'wuciyuan'],
+    subscribedPrograms: allPrograms,
     podcastQueue: [{
         "episode": 41,
         "link": "https://ipn.li/yitianshijie/41",
@@ -149,7 +150,7 @@ const state = {
         "listened": false,
         "program": "yitianshijie",
         "pubDate": "2016-12-23T12:07:19.000Z",
-        "pureTitle": "作为听觉",
+        "pureTitle": "作为听觉 AR 的 AirPods",
         "title": "一天世界 #45: 作为听觉 AR 的 AirPods"
     }, {
         "episode": 60,
@@ -194,8 +195,16 @@ export const helper = {
 }
 
 const getters = {
+    podcastQueue(state) {
+        return state.podcastQueue
+    },
     unlistened(state) {
         let itemList = state.podcastQueue.filter(podcast => state.subscribedPrograms.indexOf(podcast.program) !== -1 && !podcast.listened)
+        itemList.reverse()
+        return itemList
+    },
+    all(state) {
+        let itemList = state.podcastQueue.slice()
         itemList.reverse()
         return itemList
     }
@@ -203,9 +212,16 @@ const getters = {
 
 const mutations = {
     markListened(state, { title }) {
-        console.log(title)
         let podcast = helper.getItemByTitle(state, title)
         Vue.set(podcast, 'listened', true)
+    },
+    markUnlistened(state, { title }) {
+        let podcast = helper.getItemByTitle(state, title)
+        Vue.set(podcast, 'listened', false)
+    },
+    flipListened(state, { title }) {
+        let podcast = helper.getItemByTitle(state, title)
+        Vue.set(podcast, 'listened', !podcast.listened)
     }
 }
 
