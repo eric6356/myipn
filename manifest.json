@@ -5,7 +5,7 @@
   "version": "0.9",
   "content_scripts": [{
     "matches": [
-      "http://ipn.li/*"
+      "*://ipn.li/*"
       ],
     "js": ["main.js"],
     "css": ["main.css"]
@@ -16,11 +16,17 @@
   },
   "permissions": [
     "declarativeContent",
-    "storage"
+    "notifications",
+    "storage",
+    "alarms"
   ],
   "icons": {
-    "16": "icons/icon16.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
+    "16": "img/icons/icon16.png",
+    "48": "img/icons/icon48.png",
+    "128": "img/icons/icon128.png"
+  },
+  "browser_action": {
+    "default_icon": "img/icons/icon48.png",
+    "default_popup": "popup/popup.html"
   }
 }
