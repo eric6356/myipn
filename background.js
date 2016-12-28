@@ -96,6 +96,18 @@ function pushPodcasts(podcasts) {
     })
 }
 
+function ifBadgeEnabled() {
+    return new Promise(function(resolve, reject) {
+        chrome.storage.sync.get('badgeEnabled', function(x) {
+            if (x.badgeEnabled) {
+                resolve()
+            } else {
+                reject()
+            }
+        })
+    })
+}
+
 function ifNotiEnabled() {
     return new Promise(function(resolve, reject) {
         chrome.storage.sync.get('notiEnabled', function(x) {
@@ -220,12 +232,22 @@ function fetchAndUpdate(isFirstRun) {
                 return pushPodcasts(podcastsToPush)
             }
         })
-        .then(function(podcasts) {
-            if (podcasts !== undefined && !isFirstRun) {
+        .then(function(pushedPodcasts) {
+            if (pushedPodcasts !== undefined && !isFirstRun) {
                 return ifNotiEnabled().then(function() {
-                    return Promise.all(podcasts.map(notifyPodcast))
+                    return Promise.all(pushedPodcasts.map(notifyPodcast))
                 })
             }
+        })
+        .then(function() {
+            return ifBadgeEnabled()
+            .then(function() {
+                var unlistenedCount = podcasts.filter(function(one) { return !one.listened }).length
+                var text = unlistenedCount ? unlistenedCount.toString() : ''
+                chrome.browserAction.setBadgeText({ text: text })
+            }, function() {
+                chrome.browserAction.setBadgeText({ text: '' })
+            })
         })
         .catch(err => console.log(err))
 }

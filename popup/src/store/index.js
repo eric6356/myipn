@@ -227,6 +227,10 @@ export const helper = {
             })
 
         })
+    },
+    updateBadge({getters}) {
+        const text = (getters.badgeEnabled && getters.unlistened.length) ? getters.unlistened.length.toString() : ''
+        window.chrome.browserAction.setBadgeText({ text })
     }
 }
 
@@ -289,28 +293,34 @@ const mutations = {
 }
 
 const actions = {
-    markListened({state, commit}, podcast) {
+    markListened({state, commit, getters}, podcast) {
         commit('markListened', podcast)
         helper.saveStateToStorage(state)
+        helper.updateBadge({ getters })
     },
-    markUnlistened({state, commit}, podcast) {
+    markUnlistened({state, commit, getters}, podcast) {
         commit('markUnlistened', podcast)
         helper.saveStateToStorage(state)
+        helper.updateBadge({ getters })
     },
-    flipListened({state, commit}, podcast) {
+    flipListened({state, commit, getters}, podcast) {
         commit('flipListened', podcast)
         helper.saveStateToStorage(state)
+        helper.updateBadge({ getters })
     },
-    updateStateFromStorage({state}) {
-        helper.updateStateFromStorage(state)
+    updateStateFromStorage({state, getters}) {
+        helper.updateStateFromStorage(state).then(() => {
+            helper.updateBadge({ getters })
+        })
     },
     flipNoti({state, commit}) {
         commit('flipNoti')
         helper.saveStateToStorage(state)
     },
-    flipBadge({state, commit}) {
+    flipBadge({state, commit, getters}) {
         commit('flipBadge')
         helper.saveStateToStorage(state)
+        helper.updateBadge({ getters })
     },
     flipAutoMark({state, commit}) {
         commit('flipAutoMark')

@@ -1,4 +1,11 @@
 #!/bin/sh
+
+if [ $1 = "-b" ]; then
+   cd popup
+   npm run build
+   cd ..
+fi
+
 if [ -f output.zip ]; then
     rm output.zip
 fi
