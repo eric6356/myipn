@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "My IPN",
   "description": "IPN 播客扩展",
-  "version": "0.9",
+  "version": "0.10",
   "content_scripts": [{
     "matches": [
       "*://ipn.li/*"
