@@ -5,10 +5,15 @@ chrome.runtime.onInstalled.addListener(function() {
         podcastQueue: podcastQueue,
         subscribedPrograms: subscribedPrograms,
         notiEnabled: true,
-        badgeEnabled: true
+        badgeEnabled: true,
+        autoMark: true,
     }, function() {
         console.log('config initilized.')
     })
+    chrome.alarms.create('fetch', {
+        periodInMinutes: 10
+    })
+    fetchAndUpdate(true)
 })
 
 function parsePodcastItem(itemEL) {
@@ -26,7 +31,7 @@ function parsePodcastItem(itemEL) {
     }
     var splitTitle = item.title.split(' ')
     item.episode = parseInt(splitTitle[1].slice(1, -1))
-    item.pureTitle = splitTitle.slice(2).join('')
+    item.pureTitle = splitTitle.slice(2).join(' ')
     item.pubDate = new Date(item.pubDate).toJSON()
     item.program = item.link.split('/').slice(-2, -1)[0]
     return item
@@ -78,7 +83,7 @@ function pushPodcasts(podcasts) {
                     pureTitle: item.pureTitle,
                     pubDate: item.pubDate,
                     link: item.link,
-                    listened: false
+                    listened: item.listened || false
                 })
                 console.log(`item pushed: ${item.title}`)
             })
@@ -91,32 +96,98 @@ function pushPodcasts(podcasts) {
     })
 }
 
-function notifyPodcastIfSubscribed(podcast) {
+function ifNotiEnabled() {
+    return new Promise(function(resolve, reject) {
+        chrome.storage.sync.get('notiEnabled', function(x) {
+            if (x.notiEnabled) {
+                resolve()
+            } else {
+                reject()
+            }
+        })
+    })
+}
+
+function ifAutoMark() {
+    return new Promise(function(resolve, reject) {
+        chrome.storage.sync.get('autoMark', function(x) {
+            if (x.autoMark) {
+                resolve()
+            } else {
+                reject()
+            }
+        })
+    });
+}
+
+function ifSubscribed(podcast) {
     return new Promise(function(resolve, reject) {
         chrome.storage.sync.get('subscribedPrograms', function(x) {
             if (x.subscribedPrograms.indexOf(podcast.program) !== -1) {
-                var message = podcast.descriptionText.split('\n')[0]
-                if (message.length > 20) {
-                    message = message.slice(0, 17) + '...'
-                }
-                var opt = {
-                    type: 'basic',
-                    iconUrl: 'img/ipn_icons/' + ['icon', podcast.program, '300.png'].join('-'),
-                    title: '#' + podcast.episode + ' ' + podcast.pureTitle,
-                    message: message,
-                    isClickable: true
-                }
-                chrome.notifications.create(podcast.title, opt, function() {
-                    resolve(podcast)
-                })
+                resolve(podcast)
+            } else {
+                reject()
             }
+        })
+    })
+}
+
+function notifyPodcast(podcast) {
+    return ifSubscribed(podcast).then(function() {
+        var message = podcast.descriptionText.split('\n')[0]
+        if (message.length > 20) {
+            message = message.slice(0, 17) + '...'
+        }
+        var opt = {
+            type: 'basic',
+            iconUrl: 'img/ipn_icons/' + ['icon', podcast.program, '300.png'].join('-'),
+            title: '#' + podcast.episode + ' ' + podcast.pureTitle,
+            message: message,
+            isClickable: true
+        }
+        chrome.notifications.create(podcast.title, opt)
+    })
+}
+
+// function notifyPodcastIfSubscribed(podcast) {
+//     return new Promise(function(resolve, reject) {
+//         chrome.storage.sync.get('subscribedPrograms', function(x) {
+//             if (x.subscribedPrograms.indexOf(podcast.program) !== -1) {
+//                 var message = podcast.descriptionText.split('\n')[0]
+//                 if (message.length > 20) {
+//                     message = message.slice(0, 17) + '...'
+//                 }
+//                 var opt = {
+//                     type: 'basic',
+//                     iconUrl: 'img/ipn_icons/' + ['icon', podcast.program, '300.png'].join('-'),
+//                     title: '#' + podcast.episode + ' ' + podcast.pureTitle,
+//                     message: message,
+//                     isClickable: true
+//                 }
+//                 chrome.notifications.create(podcast.title, opt, function() {
+//                     resolve(podcast)
+//                 })
+//             }
+//         })
+//     })
+// }
+
+function markPodcastAsListened(podcast) {
+    return new Promise(function(resolve, reject) {
+        chrome.storage.sync.get('podcastQueue', function(x) {
+            for (var i = 0; i < x.podcastQueue.length; i++) {
+                if (x.podcastQueue[i].title === podcast.title) {
+                    x.podcastQueue[i].listened = true
+                }
+            }
+            chrome.storage.sync.set({ podcastQueue: x.podcastQueue }, resolve)
         })
     })
 }
 
 var podcasts
 
-function fetchAndUpdate(mute) {
+function fetchAndUpdate(isFirstRun) {
     var parser = new DOMParser();
     fetch('http://ipn.li/feed')
         .then(function(response) {
@@ -132,6 +203,11 @@ function fetchAndUpdate(mute) {
             var itemELs = doc.getElementsByTagName('item')
                 // podcasts: [latestPodcast, secondLatestPodcast, ... oldestPodcast]
             podcasts = [].slice.call(itemELs).map(parsePodcastItem)
+            if (isFirstRun) { // mark oldest 10 podcasts as listened
+                for (var i = 10; i < 20; i++) {
+                    podcasts[i].listened = true
+                }
+            }
             var oldestPodcast = podcasts.slice(-1)[0]
             console.log(`oldestPodcast: ${oldestPodcast.title}`)
             return isNewPodcast(oldestPodcast)
@@ -145,8 +221,10 @@ function fetchAndUpdate(mute) {
             }
         })
         .then(function(podcasts) {
-            if (podcasts !== undefined && !mute) {
-                return Promise.all(podcasts.map(notifyPodcastIfSubscribed))
+            if (podcasts !== undefined && !isFirstRun) {
+                return ifNotiEnabled().then(function() {
+                    return Promise.all(podcasts.map(notifyPodcast))
+                })
             }
         })
         .catch(err => console.log(err))
@@ -154,32 +232,17 @@ function fetchAndUpdate(mute) {
 
 chrome.notifications.onClicked.addListener(function(title) {
     console.log(title)
-    isNewPodcast({
-            title: title
-        })
+    var podcast
+    isNewPodcast({ title: title })
         .then(function(result) {
-            window.open(result.storedPodcast.link, '_blank')
+            podcast = result.storedPodcast
+            window.open(podcast.link, '_blank')
             chrome.notifications.clear(title)
+            return ifAutoMark()
         })
-})
-
-chrome.storage.sync.get({
-    notiEnabled: false
-}, function(x) {
-    if (x.notiEnabled) {
-        console.log(`fetch and update for the first time at ${new Date()}`)
-        fetchAndUpdate(true)
-        chrome.alarms.create('fetch', {
-            periodInMinutes: 10
+        .then(function() {
+            markPodcastAsListened(podcast)
         })
-    }
-})
-
-chrome.alarms.onAlarm.addListener(function(alarm) {
-    if (alarm.name === 'fetch') {
-        console.log(`fetch and update at ${new Date()}`)
-        fetchAndUpdate()
-    }
 })
 
 chrome.alarms.onAlarm.addListener(function(alarm) {

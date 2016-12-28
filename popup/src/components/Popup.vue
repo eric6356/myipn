@@ -2,9 +2,7 @@
 
 body {
     font-family: 'Avenir Next', Avenir, 'Helvetica Neue', Helvetica, 'Lantinghei SC', 'Hiragino Sans GB', sans-serif;
-    width: 14rem;
 }
-body::-webkit-scrollbar{width:0px}
 
 
 body,
@@ -30,6 +28,7 @@ li {
 .popup__header {
     font-size: 1.2rem;
     width: 14rem;
+    margin: .5rem 0;
     display: flex;
     justify-content: space-between;
 }
@@ -87,13 +86,30 @@ li {
     background-color: #e16b8c;
 }
 
+.popup__footer-cell {
+    flex: 1 0 0;
+    height: 1.6rem;
+    align-items: center;
+    justify-content: center;
+}
+.popup__footer-cell p {
+    margin: 0 .2rem;
+}
+.popup__footer-cell:hover {
+    background-color: lightgrey;
+    box-shadow: 0 .1rem .1rem 0 rgba(0,0,0,0.3);
+}
+
+.popup__footer {
+    font-size: .75rem;
+}
 </style>
 
 <template>
 
 <div id="popup">
-    <podcast-list/>
-    <preference/>
+    <podcast-list v-show="!$store.getters.preferenceOpened" />
+    <preference v-show="$store.getters.preferenceOpened"/>
 </div>
 
 </template>
@@ -108,6 +124,9 @@ export default {
     components: {
         PodcastList,
         Preference
+    },
+    mounted() {
+        this.$store.dispatch('updateStateFromStorage')
     }
 }
 

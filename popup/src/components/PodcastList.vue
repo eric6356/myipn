@@ -11,6 +11,7 @@
 }
 
 .popup__podcast-list-cell {
+    flex: 0 0 1.7rem;
     align-items: center;
     padding: .2rem;
     cursor: pointer;
@@ -40,8 +41,8 @@
 }
 
 .popup__podcast-list-cell-text-episode {
-    margin: 0 .3rem;
-    flex: 0 0 2.3rem;
+    margin: 0 .1rem;
+    flex: 0 0 2rem;
 }
 .popup__podcast-list-cell-text-ellipse {
     flex: 1;
@@ -64,23 +65,6 @@
 /*.popup__footer-cell--right {
     border-left: 1px solid black;
 }*/
-.popup__footer-cell {
-    flex-grow: 1;
-    height: 1.6rem;
-    align-items: center;
-    justify-content: center;
-}
-.popup__footer-cell p {
-    margin: 0 .2rem;
-}
-.popup__footer-cell:hover {
-    background-color: lightgrey;
-    box-shadow: 0 .1rem .1rem 0 rgba(0,0,0,0.3);
-}
-
-.popup__footer {
-    font-size: .75rem;
-}
 
 </style>
 
@@ -88,9 +72,7 @@
 
 <div class="popup__podcast">
     <div class="popup__header">
-        <div class="popup__header-icon popup__header-icon--left">
-
-        </div>
+        <div class="popup__header-icon popup__header-icon--left"></div>
         <div class="popup__header-text">
             <p>{{ headerText }}</p>
         </div>
@@ -138,7 +120,7 @@ import ButtonCheckmark from './ButtonCheckmark.vue'
 export default {
     data() {
         return {
-            activeCell: 2,
+            activeCell: null,
             showAll: false
         }
     },
@@ -159,7 +141,7 @@ export default {
             return this.showAll ? '显示未听' : '显示全部'
         },
         podcastList() {
-            return this.showAll ? this.$store.getters.all : this.$store.getters.unlistened
+            return this.showAll ? this.$store.getters.all.slice(0, 10) : this.$store.getters.unlistened
         }
     },
     methods: {
@@ -171,13 +153,16 @@ export default {
             window.open(`http://ipn.li/${podcast.program}`, '_blank')
         },
         openPodcast(podcast) {
+            if (this.$store.getters.autoMark) {
+                this.$store.dispatch('markListened', podcast)
+            }
             window.open(podcast.link, '_blank')
         },
         flipListened(podcast) {
-            this.$store.commit('flipListened', podcast)
+            this.$store.dispatch('flipListened', podcast)
         },
         markAll() {
-            this.podcastList.map(podcast => this.$store.commit('markListened', podcast))
+            this.podcastList.map(podcast => this.$store.dispatch('markListened', podcast))
         },
         activateCell(i) {
             this.activeCell = i
@@ -189,7 +174,7 @@ export default {
             return this.activeCell === i ? 'popup__podcast-list-cell--active ' + podcast.program : ''
         },
         openPreference() {
-            console.log('open preference')
+            this.$store.commit('openPreference')
         },
     },
     components: {
