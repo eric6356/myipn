@@ -2,8 +2,8 @@
 让网页版的 IPN 播客更美好
 
 ## Screen Shots
-![player](https://raw.githubusercontent.com/eric6356/myipn/master/screenshot/player.png)
-![podcastList](https://raw.githubusercontent.com/eric6356/myipn/master/screenshot/podcastList.png)
+![player](https://raw.githubusercontent.com/eric6356/myipn/master/screenshots/player.png)
+![podcastList](https://raw.githubusercontent.com/eric6356/myipn/master/screenshots/podcastList.png)
 
 
 ## Usage
