@@ -161,6 +161,20 @@ function notifyPodcast(podcast) {
     })
 }
 
+function updateBadge() {
+    console.log('updateBadge called')
+    return ifBadgeEnabled()
+    .then(function() {
+        chrome.storage.sync.get('podcastQueue', function(x) {
+            var unlistenedCount = x.podcastQueue.filter(function(one) { return !one.listened }).length
+            var text = unlistenedCount ? unlistenedCount.toString() : ''
+            chrome.browserAction.setBadgeText({ text: text })
+        })
+    }, function() {
+        chrome.browserAction.setBadgeText({ text: '' })
+    })
+}
+
 // function notifyPodcastIfSubscribed(podcast) {
 //     return new Promise(function(resolve, reject) {
 //         chrome.storage.sync.get('subscribedPrograms', function(x) {
@@ -239,21 +253,11 @@ function fetchAndUpdate(isFirstRun) {
                 })
             }
         })
-        .then(function() {
-            return ifBadgeEnabled()
-            .then(function() {
-                var unlistenedCount = podcasts.filter(function(one) { return !one.listened }).length
-                var text = unlistenedCount ? unlistenedCount.toString() : ''
-                chrome.browserAction.setBadgeText({ text: text })
-            }, function() {
-                chrome.browserAction.setBadgeText({ text: '' })
-            })
-        })
+        .then(updateBadge)
         .catch(err => console.log(err))
 }
 
 chrome.notifications.onClicked.addListener(function(title) {
-    console.log(title)
     var podcast
     isNewPodcast({ title: title })
         .then(function(result) {
