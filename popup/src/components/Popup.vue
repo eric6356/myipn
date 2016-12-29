@@ -1,6 +1,7 @@
 <style>
 
 body {
+    font-size: 100%;
     font-family: 'Avenir Next', Avenir, 'Helvetica Neue', Helvetica, 'Lantinghei SC', 'Hiragino Sans GB', sans-serif;
 }
 
@@ -28,7 +29,7 @@ li {
 .popup__header {
     font-size: 1.2rem;
     width: 14rem;
-    margin: .5rem 0;
+    margin: .6rem 0 .2rem 0;
     display: flex;
     justify-content: space-between;
 }
@@ -36,8 +37,10 @@ li {
 .popup__header-icon {
     display: flex;
     width: 2rem;
-    justify-content: center;
-    align-items: center;
+    align-items: flex-end;
+}
+.popup__header-icon--right {
+    flex-direction: row-reverse;
 }
 .popup__header-icon--inner {
     cursor: pointer;

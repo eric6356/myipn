@@ -11,7 +11,7 @@
 }
 
 .popup__podcast-list-cell {
-    flex: 0 0 1.7rem;
+    flex: 0 0 2rem;
     align-items: center;
     padding: .2rem;
     cursor: pointer;
@@ -27,22 +27,20 @@
     box-sizing: border-box;
     border: 1px solid white;
     overflow: hidden;
-    min-width: 1.6rem;
-    width: 1.6rem;
-    height: 1.6rem;
+    width: 2rem;
+    height: 2rem;
     margin: .2rem;
 }
 
 .popup__podcast-list-cell img:hover {
     margin: 0;
-    min-width: 2rem;
-    width: 2rem;
-    height: 2rem;
+    width: 2.4rem;
+    height: 2.4rem;
 }
 
 .popup__podcast-list-cell-text-episode {
-    margin: 0 .1rem;
-    flex: 0 0 2rem;
+    margin: 0 0 0 .1rem;
+    flex: 0 0 2.5rem;
 }
 .popup__podcast-list-cell-text-ellipse {
     flex: 1;
@@ -130,7 +128,7 @@ export default {
         },
         headerText() {
             if (this.showAll) {
-                return '全部播客（20）'
+                return '全部播客（10）'
             }
             else {
                 const podcastCount = this.podcastCount
