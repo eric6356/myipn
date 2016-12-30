@@ -182,7 +182,8 @@ const state = {
         badgeEnabled: null,
         autoMark: null
     },
-    preferenceOpened: false
+    preferenceOpened: false,
+    allShown: false
 }
 
 export const helper = {
@@ -199,7 +200,7 @@ export const helper = {
                 Object.keys(monkStored).map(k => {
                     Vue.set(state.chromeStored, k, monkStored[k])
                 })
-                console.log(`state updated: ${JSON.stringify(state)}`)
+                // console.log(`state updated: ${JSON.stringify(state)}`)
                 resolve(state)
             }, 1000)
 
@@ -250,6 +251,12 @@ const getters = {
     preferenceOpened(state) {
         return state.preferenceOpened
     },
+    markAllIsShown(state, getters) {
+        return getters.unlistened.length && !state.preferenceOpened && !state.allShown
+    },
+    allShown(state) {
+        return state.allShown
+    },
     notiEnabled(state) {
         return state.chromeStored.notiEnabled
     },
@@ -289,6 +296,9 @@ const mutations = {
     flipAutoMark(state) {
         state.chromeStored.autoMark = !state.chromeStored.autoMark
     },
+    flipShowAll(state) {
+        state.allShown = !state.allShown
+    }
 }
 
 const actions = {

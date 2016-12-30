@@ -1,0 +1,18 @@
+.wrapper {
+    align-self: stretch;
+}
+.main {
+    position: relative;
+    justify-content: center;
+    align-self: center;
+}
+.tooltip {
+    font-size: .5rem;
+    width: 4em;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    padding: .2em;
+    background-color: rgba(0,0,0,0.5);
+    color: white;
+}

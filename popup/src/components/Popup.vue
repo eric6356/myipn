@@ -1,124 +1,37 @@
-<style>
-
-body {
-    font-size: 100%;
-    font-family: 'Avenir Next', Avenir, 'Helvetica Neue', Helvetica, 'Lantinghei SC', 'Hiragino Sans GB', sans-serif;
+ <style scoped>
+ .body-animated {
+    animation-duration: .2s !important;
 }
 
-
-body,
-div,
-h1,
-h2,
-h3,
-h4,
-a,
-p,
-span,
-ul,
-li {
-    display: flex;
-    margin: 0;
-    padding: 0;
+.popup__podcast {
+    flex-direction: column;
 }
 
-::selection {
-    background: none;
-}
-
-.popup__header {
-    font-size: 1.2rem;
-    width: 14rem;
-    margin: .6rem 0 .2rem 0;
-    display: flex;
-    justify-content: space-between;
-}
-
-.popup__header-icon {
-    display: flex;
-    width: 2rem;
-    align-items: flex-end;
-}
-.popup__header-icon--right {
-    flex-direction: row-reverse;
-}
-.popup__header-icon--inner {
-    cursor: pointer;
-}
-
-.bixiaguan {
-    background-color: #e61a27;
-}
-.bowuzhi {
-    background-color: #58b2dc;
-}
-.crazycapital {
-    background-color: #A831DB;
-}
-.fashionmonster {
-    background-color: #252525;
-}
-.hardimage {
-    background-color: #8daf50;
-}
-.history {
-    background-color: #efbb24;
-}
-.itgonglun {
-    background-color: #f9441a;
-}
-.kernelpanic {
-    background-color: #ff7e00;
-}
-.popdispatch {
-    background-color: #ef2589;
-}
-.taiyilaile {
-    background-color: #05657b;
-}
-.wuciyuan {
-    background-color: #000000;
-}
-.weizhidao {
-    background-color: #03a17e;
-}
-.xuanmei {
-    background-color: #0052a5;
-}
-.yitianshijie {
-    background-color: #e16b8c;
-}
-
-.popup__footer-cell {
-    flex: 1 0 0;
-    height: 1.6rem;
-    align-items: center;
-    justify-content: center;
-}
-.popup__footer-cell p {
-    margin: 0 .2rem;
-}
-.popup__footer-cell:hover {
-    background-color: lightgrey;
-    box-shadow: 0 .1rem .1rem 0 rgba(0,0,0,0.3);
-}
-
-.popup__footer {
-    font-size: .75rem;
-}
 </style>
 
 <template>
 
-<div id="popup">
-    <podcast-list v-show="!$store.getters.preferenceOpened" />
-    <preference v-show="$store.getters.preferenceOpened"/>
+<div class="popup__podcast">
+    <popup-header />
+    <transition
+        name="popup-body"
+        mode="out-in"
+        @before-enter="beforeBodyEnter"
+        @before-leave="beforeBodyLeave"
+        @enter="bodyEnter"
+        @leave="bodyLeave">
+        <preference v-if="$store.getters.preferenceOpened"/>
+        <podcast-list v-if="!$store.getters.preferenceOpened && !$store.getters.allShown" :podcasts="$store.getters.unlistened" key="unlistened"/>
+        <podcast-list v-if="!$store.getters.preferenceOpened && $store.getters.allShown" :podcasts="$store.getters.all.slice(0, 10)" key="all"/>
+    </transition>
+    <popup-footer />
 </div>
 
 </template>
-
 <script>
-
+// import Velocity from 'velocity-animate/velocity.js'
+import PopupHeader from './PopupHeader.vue'
+import PopupFooter from './PopupFooter.vue'
 import PodcastList from './PodcastList.vue'
 import Preference from './Preference.vue'
 
@@ -126,10 +39,27 @@ export default {
     name: 'popup',
     components: {
         PodcastList,
-        Preference
+        Preference,
+        PopupHeader,
+        PopupFooter
     },
     mounted() {
         this.$store.dispatch('updateStateFromStorage')
+        // console.log(Velocity)
+    },
+    methods: {
+        bodyEnter(el, done) {
+            console.log('enter')
+        },
+        bodyLeave(el, done) {
+            console.log('leave')
+        },
+        beforeBodyEnter(el) {
+            console.log('before enter')
+        },
+        beforeBodyLeave(el) {
+            console.log('before leave')
+        }
     }
 }
 
