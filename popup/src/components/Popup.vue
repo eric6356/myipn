@@ -1,7 +1,7 @@
 <style src="../../node_modules/animate.css/animate.css"></style>
  <style scoped>
  .popup__body {
-    animation-duration: .2s !important;
+    animation-duration: .2s;
 }
 
 .popup {
@@ -73,13 +73,11 @@ export default {
             }
         },
         beforeBodyEnter(el) {
-            console.log('before enter')
         },
         beforeBodyLeave(el) {
             if (el.children.length === 0) {
                 this.animationEnable = false
             }
-            console.log('before leave')
         }
     }
 }

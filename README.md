@@ -10,5 +10,8 @@
 访问 [Chrome 网上应用商店](https://chrome.google.com/webstore/detail/my-ipn/ajhgfeoabcehhmfimiljkihnifbkhnkk)，或者在 [releases 页面](https://github.com/eric6356/myipn/releases) 下载 crx 安装
 
 ## TODO
-- [ ] transition effects
+- [x] transition effects
 - [ ] 订阅特定的节目
+
+## License
+[MIT](https://opensource.org/licenses/MIT)

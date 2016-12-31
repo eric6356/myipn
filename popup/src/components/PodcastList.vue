@@ -9,6 +9,7 @@
     flex: 0 0 2.5rem;
     align-items: stretch;
     cursor: pointer;
+    padding-right: .3rem;
     animation-duration: .5s;
 }
 
