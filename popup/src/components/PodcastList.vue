@@ -1,21 +1,15 @@
 <style scoped>
 
-.animated {
-    animation-duration: .5s;
-}
-
 .podcast-list {
     flex-direction: column;
     width: 14rem;
-}
-.podcast-list.has-child {
-    border-bottom: 1px solid black;
 }
 
 .podcast-list__cell {
     flex: 0 0 2.5rem;
     align-items: stretch;
     cursor: pointer;
+    animation-duration: .5s;
 }
 
 .podcast-list__cell > * {
@@ -188,8 +182,7 @@
 </style>
 
 <template>
-
-<transition-group class="podcast-list" name="podcast-list" tag="ul" enter-active-class="animated fadeInRight" leave-active-class="animated bounceOutLeft" :class="{ 'has-child' : podcasts.length }">
+<transition-group class="podcast-list" name="podcast-list" tag="ul" enter-active-class="animated fadeInRight" leave-active-class="animated bounceOutLeft">
     <li v-for="(podcast, i) in podcasts" :key='podcast' class="podcast-list__cell" :class="podcast.program">
         <div class="podcast-list__cell-img">
             <img :src="getIconSrc(podcast)" :alt="podcast.program" :title="podcast.program" @click="openProgram(podcast)">
@@ -216,24 +209,24 @@ export default {
     props: ['podcasts'],
     methods: {
         getIconSrc(podcast) {
-                const icon = ['icon', podcast.program, '300.png'].join('-')
-                return `../../../img/ipn_icons/${icon}`
-            },
-            openProgram(podcast) {
-                window.open(`http://ipn.li/${podcast.program}`, '_blank')
-            },
-            openPodcast(podcast) {
-                if (this.$store.getters.autoMark) {
-                    this.$store.dispatch('markListened', podcast)
-                }
-                window.open(podcast.link, '_blank')
-            },
-            flipListened(podcast) {
-                this.$store.dispatch('flipListened', podcast)
-            },
-            openPreference() {
-                this.$store.commit('openPreference')
-            },
+            const icon = ['icon', podcast.program, '300.png'].join('-')
+            return `../../../img/ipn_icons/${icon}`
+        },
+        openProgram(podcast) {
+            window.open(`http://ipn.li/${podcast.program}`, '_blank')
+        },
+        openPodcast(podcast) {
+            if (this.$store.getters.autoMark) {
+                this.$store.dispatch('markListened', podcast)
+            }
+            window.open(podcast.link, '_blank')
+        },
+        flipListened(podcast) {
+            this.$store.dispatch('flipListened', podcast)
+        },
+        openPreference() {
+            this.$store.commit('openPreference')
+        },
     },
     components: {
         Checkmark,

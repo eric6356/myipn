@@ -202,7 +202,7 @@ export const helper = {
                 })
                 // console.log(`state updated: ${JSON.stringify(state)}`)
                 resolve(state)
-            }, 1000)
+            }, 500)
 
             // window.chrome.storage.sync.get(Object.keys(state.chromeStored), x => {
             //     Object.keys(x).map(k => {

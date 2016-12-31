@@ -20,6 +20,9 @@
 .footer {
     font-size: .75rem;
 }
+.footer.has-border {
+    border-top: 1px solid black;
+}
 
 
 
@@ -27,7 +30,7 @@
 
 <template lang="html">
 
-<div class="footer">
+<div class="footer" :class="{ 'has-border':!(!this.$store.getters.allShown && !this.$store.getters.unlistened.length && !this.$store.getters.preferenceOpened) }">
     <div class="footer__cell" @click="$store.commit('flipShowAll')" v-show="!$store.getters.preferenceOpened">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
             <path fill="#0052a5" d="M9.01 14H2v2h7.01v3L13 15l-3.99-4v3zm5.98-1v-3H22V8h-7.01V5L11 9l3.99 4z" />

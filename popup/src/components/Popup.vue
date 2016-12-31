@@ -1,9 +1,10 @@
+<style src="../../node_modules/animate.css/animate.css"></style>
  <style scoped>
- .body-animated {
+ .popup__body {
     animation-duration: .2s !important;
 }
 
-.popup__podcast {
+.popup {
     flex-direction: column;
 }
 
@@ -11,25 +12,25 @@
 
 <template>
 
-<div class="popup__podcast">
+<div class="popup">
     <popup-header />
     <transition
-        name="popup-body"
+        name="foba"
         mode="out-in"
         @before-enter="beforeBodyEnter"
         @before-leave="beforeBodyLeave"
         @enter="bodyEnter"
-        @leave="bodyLeave">
-        <preference v-if="$store.getters.preferenceOpened"/>
-        <podcast-list v-if="!$store.getters.preferenceOpened && !$store.getters.allShown" :podcasts="$store.getters.unlistened" key="unlistened"/>
-        <podcast-list v-if="!$store.getters.preferenceOpened && $store.getters.allShown" :podcasts="$store.getters.all.slice(0, 10)" key="all"/>
+        @leave="bodyLeave"
+        >
+        <preference class="popup__body" v-if="$store.getters.preferenceOpened"/>
+        <podcast-list class="popup__body" v-if="!$store.getters.preferenceOpened && !$store.getters.allShown" :podcasts="$store.getters.unlistened" key="unlistened"/>
+        <podcast-list class="popup__body" v-if="!$store.getters.preferenceOpened && $store.getters.allShown" :podcasts="$store.getters.all.slice(0, 10)" key="all"/>
     </transition>
     <popup-footer />
 </div>
 
 </template>
 <script>
-// import Velocity from 'velocity-animate/velocity.js'
 import PopupHeader from './PopupHeader.vue'
 import PopupFooter from './PopupFooter.vue'
 import PodcastList from './PodcastList.vue'
@@ -37,6 +38,11 @@ import Preference from './Preference.vue'
 
 export default {
     name: 'popup',
+    data() {
+        return {
+            animationEnable: true
+        }
+    },
     components: {
         PodcastList,
         Preference,
@@ -45,19 +51,34 @@ export default {
     },
     mounted() {
         this.$store.dispatch('updateStateFromStorage')
-        // console.log(Velocity)
     },
     methods: {
         bodyEnter(el, done) {
-            console.log('enter')
+            el.className += this.$store.getters.preferenceOpened ? ' animated fadeInRight' : ' animated fadeInLeft'
+            if (!this.$store.getters.preferenceOpened && !this.$store.getters.allShown && !this.$store.getters.unlistened.length) {
+                done()
+            }
+            else {
+                setTimeout(done, 200)
+            }
         },
         bodyLeave(el, done) {
-            console.log('leave')
+            el.className += this.$store.getters.preferenceOpened ? ' animated fadeOutLeft' : ' animated fadeOutRight'
+            if (this.animationEnable) {
+                setTimeout(done, 200)
+            }
+            else {
+                this.animationEnable = true
+                done()
+            }
         },
         beforeBodyEnter(el) {
             console.log('before enter')
         },
         beforeBodyLeave(el) {
+            if (el.children.length === 0) {
+                this.animationEnable = false
+            }
             console.log('before leave')
         }
     }

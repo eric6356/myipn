@@ -4,7 +4,6 @@
 }
 
 .preference__body {
-    border-bottom: 1px solid black;
     flex-direction: column;
 }
 
